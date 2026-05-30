@@ -2,167 +2,75 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Estimasi Biaya Konsumsi</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 500px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f0f2f5;
-        }
-        .container {
-            background: white;
-            padding: 25px;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-        }
-        h1 {
-            color: #1f4e79;
-            text-align: center;
-        }
-        label {
-            font-weight: bold;
-            display: block;
-            margin-top: 15px;
-        }
-        input, select {
-            width: 100%;
-            padding: 10px;
-            margin-top: 5px;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            font-size: 16px;
-            box-sizing: border-box;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            margin-top: 20px;
-            background-color: #1f4e79;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-        button:hover {
-            background-color: #0e3a5c;
-        }
-        .result {
-            margin-top: 20px;
-            padding: 15px;
-            background-color: #e8f4f8;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .error {
-            background-color: #ffe6e6;
-            color: #d32f2f;
-        }
-        footer {
-            margin-top: 20px;
-            text-align: center;
-            font-size: 12px;
-            color: #666;
-        }
+        body { font-family: Arial; margin: 40px; background: #f4f6f8; }
+        .container { background: white; padding: 24px; border-radius: 12px; max-width: 400px; margin: auto; }
+        h1 { color: #1f4e79; text-align: center; }
+        label { font-weight: bold; display: block; margin-top: 15px; }
+        input, select { width: 100%; padding: 8px; margin-top: 5px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; margin-top: 20px; background: #1f4e79; color: white; border: none; border-radius: 6px; cursor: pointer; }
+        .result { margin-top: 20px; padding: 15px; background: #eef; border-radius: 8px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>📊 Estimasi Biaya Konsumsi</h1>
-        <p style="text-align:center; color:#555;">Kegiatan Mahasiswa</p>
-        
-        <label>👥 Jumlah Peserta:</label>
-        <input type="number" id="jumlah" placeholder="Contoh: 40">
-        
-        <label>🍽️ Jenis Konsumsi:</label>
-        <select id="jenis">
-            <option value="snack">🍪 Snack (Rp15.000)</option>
-            <option value="makan">🍚 Makan (Rp30.000)</option>
-            <option value="lengkap">🍽️ Lengkap (Rp45.000)</option>
-        </select>
-        
-        <button onclick="hitungBiaya()">💰 Hitung Estimasi Biaya</button>
-        
-        <div id="result" class="result"></div>
-        
-        <footer>
-            <hr>
-            <p><strong>Praktikum Komputasi Awan</strong><br>
-            Nama: [Nama Anda] | NIM: 0920240026<br>
-            Layanan Azure: Static Web Apps, App Service, Container Apps, Functions</p>
-        </footer>
-    </div>
+<div class="container">
+    <h1>Estimasi Biaya Konsumsi</h1>
+    <label>Jumlah Peserta:</label>
+    <input type="number" id="jumlah" placeholder="Contoh: 40">
+    
+    <label>Jenis Konsumsi:</label>
+    <select id="jenis">
+        <option value="snack">Snack (Rp15.000)</option>
+        <option value="makan">Makan (Rp30.000)</option>
+        <option value="lengkap">Lengkap (Rp45.000)</option>
+    </select>
+    
+    <button onclick="hitungBiaya()">Hitung</button>
+    <div id="result" class="result"></div>
+</div>
 
-    <script>
-        // 🔴 GANTI DENGAN URL FUNCTION APP YANG BENAR
-        // Perhatikan: HttpPraktikum dengan H BESAR!
-        const BASE_URL = "https://func-serverless-0920240026.azurewebsites.net/api/HttpPraktikum";
+<script>
+    // 🔴 🔴 🔴 GANTI URL INI DENGAN HASIL DARI LANGKAH 1 (TOM 'Get Function URL') 🔴 🔴 🔴
+    const API_URL = "https://func-serverless-0920240026-cjdrayh7aee0h2cy.indonesiacentral-01.azurewebsites.net/api/HttpPraktikum";
 
-        async function hitungBiaya() {
-            // Ambil nilai dari input
-            const jumlah = document.getElementById('jumlah').value;
-            const jenis = document.getElementById('jenis').value;
-            const resultDiv = document.getElementById('result');
-            
-            // Validasi input
-            if (!jumlah || jumlah <= 0) {
-                resultDiv.innerHTML = "❌ Masukkan jumlah peserta yang valid (angka positif)!";
-                resultDiv.classList.add("error");
-                return;
-            }
-            
-            if (!jenis) {
-                resultDiv.innerHTML = "❌ Pilih jenis konsumsi!";
-                resultDiv.classList.add("error");
-                return;
-            }
-            
-            // Tampilkan loading
-            resultDiv.innerHTML = "⏳ Menghitung estimasi biaya...";
-            resultDiv.classList.remove("error");
-            
-            try {
-                // Buat URL dengan parameter
-                const url = `${BASE_URL}?jumlah=${jumlah}&jenis=${jenis}`;
-                console.log("Memanggil API:", url); // Untuk debugging
-                
-                // Panggil API
-                const response = await fetch(url);
-                
-                // Cek response
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-                }
-                
-                const data = await response.json();
-                console.log("Response API:", data); // Untuk debugging
-                
-                // Cek apakah ada error dari API
-                if (data.error) {
-                    resultDiv.innerHTML = `❌ Error dari server: ${data.error}`;
-                    resultDiv.classList.add("error");
-                    return;
-                }
-                
-                // Tampilkan hasil
-                resultDiv.innerHTML = `
-                    <p><strong>📊 Jumlah Peserta:</strong> ${data.jumlah} orang</p>
-                    <p><strong>🍽️ Jenis Konsumsi:</strong> ${data.jenis}</p>
-                    <p><strong>💰 Harga per Peserta:</strong> Rp${data.hargaPerPeserta.toLocaleString()}</p>
-                    <p><strong>💵 Total Estimasi Biaya:</strong> <strong style="color:#1f4e79;">Rp${data.total.toLocaleString()}</strong></p>
-                    <p><strong>🕐 Timestamp:</strong> ${new Date(data.timestamp).toLocaleString('id-ID')}</p>
-                `;
-                resultDiv.classList.remove("error");
-                
-            } catch (error) {
-                console.error("Error detail:", error);
-                resultDiv.innerHTML = `❌ Gagal menghubungi API: ${error.message}<br><small>Cek console browser (F12) untuk detail.</small>`;
-                resultDiv.classList.add("error");
-            }
+    async function hitungBiaya() {
+        const jumlah = document.getElementById('jumlah').value;
+        const jenis = document.getElementById('jenis').value;
+        const resultDiv = document.getElementById('result');
+        
+        if (!jumlah || jumlah <= 0) {
+            resultDiv.innerHTML = "Masukkan jumlah peserta yang valid!";
+            return;
         }
-    </script>
+        
+        resultDiv.innerHTML = "Menghitung...";
+        
+        try {
+            // Kode penting: Menambahkan parameter jumlah & jenis ke URL API
+            const url = `${API_URL}&jumlah=${jumlah}&jenis=${jenis}`;
+            console.log("Calling API:", url); // Cek di console browser
+            
+            const response = await fetch(url);
+            const data = await response.json();
+            
+            if (data.error) {
+                resultDiv.innerHTML = `Error: ${data.error}`;
+                return;
+            }
+            
+            resultDiv.innerHTML = `
+                <p><strong>Jumlah:</strong> ${data.jumlah}</p>
+                <p><strong>Jenis:</strong> ${data.jenis}</p>
+                <p><strong>Harga per peserta:</strong> Rp${data.hargaPerPeserta.toLocaleString()}</p>
+                <p><strong>Total:</strong> Rp${data.total.toLocaleString()}</p>
+                <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+            `;
+        } catch (error) {
+            console.error("Error detail:", error);
+            resultDiv.innerHTML = `Error menghubungi API: ${error.message}`;
+        }
+    }
+</script>
 </body>
 </html>
