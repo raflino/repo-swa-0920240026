@@ -1,36 +1,57 @@
 <script>
-    // Ganti dengan URL Function App ANDA!
-    const functionUrl = "https://func-serverless-0920240026-cjdrayh7aee0h2cy.indonesiacentral-01.azurewebsites.net/api/HttpPraktikum";
+    // 🔴 GANTI DENGAN URL FUNCTION APP YANG BENAR (tanpa string acak!)
+    const BASE_URL = "https://func-serverless-0920240026.azurewebsites.net/api/HttpPraktikum";
 
     async function hitungBiaya() {
         const jumlah = document.getElementById('jumlah').value;
         const jenis = document.getElementById('jenis').value;
         const resultDiv = document.getElementById('result');
         
-        if (!jumlah) {
-            resultDiv.innerHTML = "Masukkan jumlah peserta!";
+        // Validasi input
+        if (!jumlah || jumlah <= 0) {
+            resultDiv.innerHTML = "❌ Masukkan jumlah peserta yang valid!";
             return;
         }
         
+        if (!jenis) {
+            resultDiv.innerHTML = "❌ Pilih jenis konsumsi!";
+            return;
+        }
+        
+        resultDiv.innerHTML = "⏳ Menghitung...";
+        
         try {
-            const response = await fetch(`${functionUrl}?jumlah=${jumlah}&jenis=${jenis}`);
+            // Buat URL dengan parameter
+            const url = `${BASE_URL}?jumlah=${jumlah}&jenis=${jenis}`;
+            console.log("Memanggil API:", url); // Untuk debugging
             
+            const response = await fetch(url);
+            
+            // Cek response HTTP
             if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
             }
             
             const data = await response.json();
+            console.log("Response API:", data); // Untuk debugging
             
+            // Cek apakah response mengandung error
+            if (data.error) {
+                resultDiv.innerHTML = `❌ Error dari server: ${data.error}`;
+                return;
+            }
+            
+            // Tampilkan hasil
             resultDiv.innerHTML = `
-                <p><strong>Jumlah:</strong> ${data.jumlah}</p>
-                <p><strong>Jenis:</strong> ${data.jenis}</p>
-                <p><strong>Harga per peserta:</strong> Rp${data.hargaPerPeserta.toLocaleString()}</p>
-                <p><strong>Total:</strong> Rp${data.total.toLocaleString()}</p>
-                <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                <p><strong>📊 Jumlah:</strong> ${data.jumlah} peserta</p>
+                <p><strong>🍽️ Jenis:</strong> ${data.jenis}</p>
+                <p><strong>💰 Harga per peserta:</strong> Rp${data.hargaPerPeserta.toLocaleString()}</p>
+                <p><strong>💵 Total estimasi biaya:</strong> Rp${data.total.toLocaleString()}</p>
+                <p><strong>🕐 Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
             `;
         } catch (error) {
-            console.error("Error:", error);
-            resultDiv.innerHTML = "Error menghubungi API. Cek console untuk detail.";
+            console.error("Error detail:", error);
+            resultDiv.innerHTML = `❌ Gagal menghubungi API: ${error.message}<br><small>Cek console browser (F12) untuk detail.</small>`;
         }
     }
 </script>
