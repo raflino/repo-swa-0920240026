@@ -1,20 +1,55 @@
 <!DOCTYPE html>
-<html lang="id">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Praktikum Azure Static Web Apps</title>
+    <title>Estimasi Biaya Konsumsi</title>
     <style>
-        body { font-family: Arial; margin: 40px; background: #f4f6f8; }
-        .container { background: white; padding: 24px; border-radius: 12px; }
-        h1 { color: #1f4e79; }
+        body { font-family: Arial; padding: 20px; }
+        .container { max-width: 500px; margin: auto; background: #f4f4f4; padding: 20px; border-radius: 10px; }
+        input, select, button { margin: 10px 0; padding: 8px; width: 100%; }
+        .result { margin-top: 20px; background: #fff; padding: 10px; border-radius: 5px; }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Praktikum Azure Static Web Apps</h1>
-        <p>Halaman ini berhasil di-deploy menggunakan Azure Static Web Apps.</p>
-        <p>Layanan:Halaman ini sudah di update</p>
-        <p>Deployment: GitHub Repository</p>
+        <h2>Estimasi Biaya Konsumsi</h2>
+        <label>Jumlah Peserta:</label>
+        <input type="number" id="jumlah" placeholder="Contoh: 40">
+        <label>Jenis Konsumsi:</label>
+        <select id="jenis">
+            <option value="snack">Snack (Rp15.000)</option>
+            <option value="makan">Makan (Rp30.000)</option>
+            <option value="lengkap">Lengkap (Rp45.000)</option>
+        </select>
+        <button onclick="hitungBiaya()">Hitung</button>
+        <div class="result" id="result"></div>
     </div>
+    <script>
+        const functionUrl = "https://func-serverless-[NIM].azurewebsites.net/api/HttpPraktikum";
+
+        async function hitungBiaya() {
+            const jumlah = document.getElementById('jumlah').value;
+            const jenis = document.getElementById('jenis').value;
+            const resultDiv = document.getElementById('result');
+            
+            if (!jumlah) {
+                resultDiv.innerHTML = "Masukkan jumlah peserta!";
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${functionUrl}?jumlah=${jumlah}&jenis=${jenis}`);
+                const data = await response.json();
+                resultDiv.innerHTML = `
+                    <p><strong>Jumlah:</strong> ${data.jumlah}</p>
+                    <p><strong>Jenis:</strong> ${data.jenis}</p>
+                    <p><strong>Harga per peserta:</strong> Rp${data.hargaPerPeserta.toLocaleString()}</p>
+                    <p><strong>Total:</strong> Rp${data.total.toLocaleString()}</p>
+                    <p><strong>Timestamp:</strong> ${new Date(data.timestamp).toLocaleString()}</p>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = "Error menghubungi API";
+            }
+        }
+    </script>
 </body>
 </html>
